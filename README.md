@@ -6,4 +6,4 @@ A full-stack web app serving as a quantitative trading bot based on the live sto
 
 ## Features 
 
-Still Under Development!
+In Progress
