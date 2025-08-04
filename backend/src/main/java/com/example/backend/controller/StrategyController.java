@@ -19,6 +19,11 @@ public class StrategyController {
         this.strategyService = strategyService;
     }
 
+    @GetMapping("/test")
+    public String testEndpoint() {
+        return "Backend is working!";
+    }
+
     @GetMapping
     public List<Strategy> getAllStrategies() {
         return strategyService.getAllStrategies();
