@@ -1,33 +1,34 @@
 import { useState } from "react";
 
-function InputForm({ onSubmit, loading }) {
+function InputForm({ onSubmit, loading, error }) {
   const [form, setForm] = useState({
     strategyType: "",
     tickerSymbol: "",
     capital: "",
     thresholdParam: "",
   });
-  const [error, setError] = useState(null);
+  const [validationError, setValidationError] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    if (validationError) setValidationError(null);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setError(null);
+    setValidationError(null);
     if (
       !form.strategyType ||
       !form.tickerSymbol ||
       !form.capital ||
       !form.thresholdParam
     ) {
-      setError("All fields are required.");
+      setValidationError("All fields are required.");
       return;
     }
     if (isNaN(Number(form.capital)) || isNaN(Number(form.thresholdParam))) {
-      setError("Capital and Threshold must be numbers.");
+      setValidationError("Capital and Threshold must be numbers.");
       return;
     }
     onSubmit({
@@ -46,6 +47,7 @@ function InputForm({ onSubmit, loading }) {
   return (
     <form onSubmit={handleSubmit}>
       <h2>Test New Strategy</h2>
+      {validationError && <p style={{ color: "red" }}>{validationError}</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
       <div>
         <label>
