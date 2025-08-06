@@ -40,6 +40,8 @@ public class StrategyService {
                     strategy.setTickerSymbol(updatedStrategy.getTickerSymbol());
                     strategy.setCapital(updatedStrategy.getCapital());
                     strategy.setThresholdParam(updatedStrategy.getThresholdParam());
+                    strategy.setStartDate(updatedStrategy.getStartDate()); 
+                    strategy.setEndDate(updatedStrategy.getEndDate());
                     return strategyRepository.save(strategy);
                 })
                 .orElseThrow(() -> new RuntimeException("Strategy not found with id: " + id));

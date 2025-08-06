@@ -21,7 +21,7 @@ public class StrategyController {
 
     @GetMapping("/test")
     public String testEndpoint() {
-        return "Backend is working!";
+        return "Backend (/api/strategy) is working!";
     }
 
     @GetMapping

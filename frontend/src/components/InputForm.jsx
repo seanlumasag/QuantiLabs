@@ -6,6 +6,8 @@ function InputForm({ onSubmit, loading, error }) {
     tickerSymbol: "",
     capital: "",
     thresholdParam: "",
+    startDate: "",
+    endDate: "",
   });
   const [validationError, setValidationError] = useState(null);
 
@@ -22,7 +24,9 @@ function InputForm({ onSubmit, loading, error }) {
       !form.strategyType ||
       !form.tickerSymbol ||
       !form.capital ||
-      !form.thresholdParam
+      !form.thresholdParam ||
+      !form.startDate ||
+      !form.endDate
     ) {
       setValidationError("All fields are required.");
       return;
@@ -41,6 +45,8 @@ function InputForm({ onSubmit, loading, error }) {
       tickerSymbol: "",
       capital: "",
       thresholdParam: "",
+      startDate: "",
+      endDate: "",
     });
   };
 
@@ -106,6 +112,30 @@ function InputForm({ onSubmit, loading, error }) {
             placeholder="e.g. 0.05"
             required
             step="any"
+          />
+        </label>
+      </div>
+      <div>
+        <label>
+          Start Date:
+          <input
+            type="date"
+            name="startDate"
+            value={form.startDate}
+            onChange={handleChange}
+            required
+          />
+        </label>
+      </div>
+      <div>
+        <label>
+          End Date:
+          <input
+            type="date"
+            name="endDate"
+            value={form.endDate}
+            onChange={handleChange}
+            required
           />
         </label>
       </div>
