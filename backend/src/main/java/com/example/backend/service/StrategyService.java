@@ -77,24 +77,100 @@ public class StrategyService {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(response.body());
             JsonNode bars = root.get("bars");
-            System.out.println("Alpaca raw response: " + response.body());
-
 
             if (bars == null || bars.isEmpty()) {
                 throw new RuntimeException("No market data found for given dates.");
             }
 
-            // Example: Simple buy & hold strategy
-            double initialPrice = bars.get(0).get("c").asDouble(); // closing price first day
-            double finalPrice = bars.get(bars.size() - 1).get("c").asDouble(); // closing price last day
+            double initialCapital = strategy.getCapital();
+            double thresholdParam = strategy.getThresholdParam();
+            String strategyType = strategy.getStrategyType();
 
-            double sharesBought = strategy.getCapital() / initialPrice;
-            double finalCapital = sharesBought * finalPrice;
+            double capital = strategy.getCapital();
+            boolean inMarket = false;
+            double shares = 0.0;
+            double entryPrice = 0.0;
+
+            if (strategyType.equals("momentum")) {
+                for (int i = 5; i < bars.size(); i++) {
+                    JsonNode bar = bars.get(i);
+                    double closePrice = bar.get("c").asDouble();
+                    double refClosePrice = bars.get(i - 5).get("c").asDouble();
+                    if (inMarket) {
+                        capital = shares * closePrice;
+                        if ((closePrice - entryPrice) / entryPrice <= -thresholdParam) {
+                            inMarket = false;
+                            shares = 0.0;
+                            entryPrice = 0.0;
+                        }
+                    } else if (!inMarket) {
+                        if ((closePrice - refClosePrice) / refClosePrice >= thresholdParam) {
+                            inMarket = true;
+                            shares = capital / closePrice;
+                            entryPrice = closePrice;
+                        }
+                    }
+                }
+
+            } else if (strategyType.equals("mean-reversion")) {
+                for (int i = 5; i < bars.size(); i++) {
+                    JsonNode bar = bars.get(i);
+                    double closePrice = bar.get("c").asDouble();
+                    double refClosePrice = bars.get(i - 5).get("c").asDouble();
+                    if (inMarket) {
+                        capital = shares * closePrice;
+                        if ((closePrice - entryPrice) / entryPrice >= thresholdParam) {
+                            inMarket = false;
+                            shares = 0.0;
+                            entryPrice = 0.0;
+                        }
+                    } else if (!inMarket) {
+                        if ((closePrice - refClosePrice) / refClosePrice <= -thresholdParam) {
+                            inMarket = true;
+                            shares = capital / closePrice;
+                            entryPrice = closePrice;
+                        }
+                    }
+                }
+            } else if (strategyType.equals("sma-crossover")) {
+                for (int i = 10; i < bars.size(); i++) {
+                    JsonNode bar = bars.get(i);
+                    double closePrice = bar.get("c").asDouble();
+                    double sma5 = 0.0;
+                    double sma10 = 0.0;
+                    for (int j = i - 5; j < i; j++) {
+                        sma5 += bars.get(j).get("c").asDouble();
+                    }
+                    sma5 /= 5;
+                    for (int j = i - 10; j < i; j++) {
+                        sma10 += bars.get(j).get("c").asDouble();
+                    }
+                    sma10 /= 10;
+                    if (inMarket) {
+                        capital = shares * closePrice;
+                        if ((sma5 - sma10) / sma10 <= -thresholdParam) {
+                            inMarket = false;
+                            shares = 0.0;
+                        }
+                    } else if (!inMarket) {
+                        if ((sma5 - sma10) / sma10 >= thresholdParam) {
+                            inMarket = true;
+                            shares = capital / closePrice;
+                        }
+                    }
+                }
+            }
+            if (inMarket) {
+                capital = shares * bars.get(bars.size() - 1).get("c").asDouble();
+                shares = 0.0;
+            }
+
+            double finalCapital = capital;
 
             // Set results
             strategy.setFinalCapital(finalCapital);
-            strategy.setProfitLoss(finalCapital - strategy.getCapital());
-            strategy.setReturnPercentage(((finalCapital - strategy.getCapital()) / strategy.getCapital()) * 100);
+            strategy.setProfitLoss(finalCapital - initialCapital);
+            strategy.setReturnPercentage((finalCapital - initialCapital) / initialCapital * 100);
 
         } catch (Exception e) {
             throw new RuntimeException("Error running strategy", e);
