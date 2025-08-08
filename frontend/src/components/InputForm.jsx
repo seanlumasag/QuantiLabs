@@ -69,7 +69,7 @@ function InputForm({ onSubmit, loading, error }) {
             </option>
             <option value="momentum">Momentum</option>
             <option value="mean-reversion">Mean-Reversion</option>
-            <option value="sma-deviation">SMA-Deviation</option>
+            <option value="sma-crossover">SMA-Crossover</option>
           </select>
         </label>
       </div>
