@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -92,10 +91,11 @@ public class StrategyService {
             double entryPrice = 0.0;
 
             if (strategyType.equals("momentum")) {
-                for (int i = 5; i < bars.size(); i++) {
+                int lookbackPeriod = strategy.getLookbackPeriod();
+                for (int i = lookbackPeriod; i < bars.size(); i++) {
                     JsonNode bar = bars.get(i);
                     double closePrice = bar.get("c").asDouble();
-                    double refClosePrice = bars.get(i - 5).get("c").asDouble();
+                    double refClosePrice = bars.get(i - lookbackPeriod).get("c").asDouble();
                     if (inMarket) {
                         capital = shares * closePrice;
                         if ((closePrice - entryPrice) / entryPrice <= -thresholdParam) {
@@ -113,10 +113,11 @@ public class StrategyService {
                 }
 
             } else if (strategyType.equals("mean-reversion")) {
-                for (int i = 5; i < bars.size(); i++) {
+                int lookbackPeriod = strategy.getLookbackPeriod();
+                for (int i = lookbackPeriod; i < bars.size(); i++) {
                     JsonNode bar = bars.get(i);
                     double closePrice = bar.get("c").asDouble();
-                    double refClosePrice = bars.get(i - 5).get("c").asDouble();
+                    double refClosePrice = bars.get(i - lookbackPeriod).get("c").asDouble();
                     if (inMarket) {
                         capital = shares * closePrice;
                         if ((closePrice - entryPrice) / entryPrice >= thresholdParam) {
@@ -133,27 +134,29 @@ public class StrategyService {
                     }
                 }
             } else if (strategyType.equals("sma-crossover")) {
-                for (int i = 10; i < bars.size(); i++) {
+                int shortSmaPeriod = strategy.getShortSmaPeriod();
+                int longSmaPeriod = strategy.getLongSmaPeriod();
+                for (int i = longSmaPeriod; i < bars.size(); i++) {
                     JsonNode bar = bars.get(i);
                     double closePrice = bar.get("c").asDouble();
-                    double sma5 = 0.0;
-                    double sma10 = 0.0;
-                    for (int j = i - 5; j < i; j++) {
-                        sma5 += bars.get(j).get("c").asDouble();
+                    double shortSma = 0.0;
+                    double longSma = 0.0;
+                    for (int j = i - shortSmaPeriod; j < i; j++) {
+                        shortSma += bars.get(j).get("c").asDouble();
                     }
-                    sma5 /= 5;
-                    for (int j = i - 10; j < i; j++) {
-                        sma10 += bars.get(j).get("c").asDouble();
+                    shortSma /= shortSmaPeriod;
+                    for (int j = i - longSmaPeriod; j < i; j++) {
+                        longSma += bars.get(j).get("c").asDouble();
                     }
-                    sma10 /= 10;
+                    longSma /= longSmaPeriod;
                     if (inMarket) {
                         capital = shares * closePrice;
-                        if ((sma5 - sma10) / sma10 <= -thresholdParam) {
+                        if ((shortSma - longSma) / longSma <= -thresholdParam) {
                             inMarket = false;
                             shares = 0.0;
                         }
                     } else if (!inMarket) {
-                        if ((sma5 - sma10) / sma10 >= thresholdParam) {
+                        if ((shortSma - longSma) / longSma >= thresholdParam) {
                             inMarket = true;
                             shares = capital / closePrice;
                         }

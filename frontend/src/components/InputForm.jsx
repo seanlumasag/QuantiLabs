@@ -8,6 +8,9 @@ function InputForm({ onSubmit, loading, error }) {
     thresholdParam: "",
     startDate: "",
     endDate: "",
+    lookbackPeriod: "", // for momentum & mean-reversion
+    shortSmaPeriod: "", // for sma-crossover
+    longSmaPeriod: "", // for sma-crossover
   });
   const [validationError, setValidationError] = useState(null);
 
@@ -20,6 +23,8 @@ function InputForm({ onSubmit, loading, error }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     setValidationError(null);
+
+    // Basic required fields check
     if (
       !form.strategyType ||
       !form.tickerSymbol ||
@@ -28,18 +33,63 @@ function InputForm({ onSubmit, loading, error }) {
       !form.startDate ||
       !form.endDate
     ) {
-      setValidationError("All fields are required.");
+      setValidationError("All required fields must be filled.");
       return;
     }
+
+    // Validate numbers for common params
     if (isNaN(Number(form.capital)) || isNaN(Number(form.thresholdParam))) {
-      setValidationError("Capital and Threshold must be numbers.");
+      setValidationError("Capital and Threshold must be valid numbers.");
       return;
     }
-    onSubmit({
-      ...form,
+
+    // Validate extra params depending on strategy
+    if (
+      (form.strategyType === "momentum" ||
+        form.strategyType === "mean-reversion") &&
+      (!form.lookbackPeriod || isNaN(Number(form.lookbackPeriod)))
+    ) {
+      setValidationError("Lookback Period must be a valid number.");
+      return;
+    }
+
+    if (form.strategyType === "sma-crossover") {
+      if (!form.shortSmaPeriod || isNaN(Number(form.shortSmaPeriod))) {
+        setValidationError("Short SMA Period must be a valid number.");
+        return;
+      }
+      if (!form.longSmaPeriod || isNaN(Number(form.longSmaPeriod))) {
+        setValidationError("Long SMA Period must be a valid number.");
+        return;
+      }
+    }
+
+    // Prepare payload, parse numbers where needed
+    const payload = {
+      strategyType: form.strategyType,
+      tickerSymbol: form.tickerSymbol,
       capital: Number(form.capital),
       thresholdParam: Number(form.thresholdParam),
-    });
+      startDate: form.startDate,
+      endDate: form.endDate,
+      lookbackPeriod:
+        form.strategyType === "momentum" ||
+        form.strategyType === "mean-reversion"
+          ? Number(form.lookbackPeriod)
+          : undefined,
+      shortSmaPeriod:
+        form.strategyType === "sma-crossover"
+          ? Number(form.shortSmaPeriod)
+          : undefined,
+      longSmaPeriod:
+        form.strategyType === "sma-crossover"
+          ? Number(form.longSmaPeriod)
+          : undefined,
+    };
+
+    onSubmit(payload);
+
+    // Reset form to empty after submit
     setForm({
       strategyType: "",
       tickerSymbol: "",
@@ -47,6 +97,9 @@ function InputForm({ onSubmit, loading, error }) {
       thresholdParam: "",
       startDate: "",
       endDate: "",
+      lookbackPeriod: "",
+      shortSmaPeriod: "",
+      longSmaPeriod: "",
     });
   };
 
@@ -73,6 +126,7 @@ function InputForm({ onSubmit, loading, error }) {
           </select>
         </label>
       </div>
+
       <div>
         <label>
           Ticker Symbol:
@@ -86,6 +140,7 @@ function InputForm({ onSubmit, loading, error }) {
           />
         </label>
       </div>
+
       <div>
         <label>
           Capital:
@@ -101,6 +156,7 @@ function InputForm({ onSubmit, loading, error }) {
           />
         </label>
       </div>
+
       <div>
         <label>
           Threshold Parameter:
@@ -115,6 +171,7 @@ function InputForm({ onSubmit, loading, error }) {
           />
         </label>
       </div>
+
       <div>
         <label>
           Start Date:
@@ -127,6 +184,7 @@ function InputForm({ onSubmit, loading, error }) {
           />
         </label>
       </div>
+
       <div>
         <label>
           End Date:
@@ -139,6 +197,60 @@ function InputForm({ onSubmit, loading, error }) {
           />
         </label>
       </div>
+
+      {/* Conditional inputs for Momentum & Mean-Reversion */}
+      {(form.strategyType === "momentum" ||
+        form.strategyType === "mean-reversion") && (
+        <div>
+          <label>
+            Lookback Period (days):
+            <input
+              type="number"
+              name="lookbackPeriod"
+              value={form.lookbackPeriod}
+              onChange={handleChange}
+              placeholder="e.g. 5"
+              required
+              min="1"
+            />
+          </label>
+        </div>
+      )}
+
+      {/* Conditional inputs for SMA-Crossover */}
+      {form.strategyType === "sma-crossover" && (
+        <>
+          <div>
+            <label>
+              Short SMA Period:
+              <input
+                type="number"
+                name="shortSmaPeriod"
+                value={form.shortSmaPeriod}
+                onChange={handleChange}
+                placeholder="e.g. 5"
+                required
+                min="1"
+              />
+            </label>
+          </div>
+          <div>
+            <label>
+              Long SMA Period:
+              <input
+                type="number"
+                name="longSmaPeriod"
+                value={form.longSmaPeriod}
+                onChange={handleChange}
+                placeholder="e.g. 10"
+                required
+                min="1"
+              />
+            </label>
+          </div>
+        </>
+      )}
+
       <button type="submit" disabled={loading}>
         {loading ? "Adding..." : "Test Strategy"}
       </button>

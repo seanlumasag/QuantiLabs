@@ -21,10 +21,13 @@ public class Strategy {
     private LocalDate startDate;
     private LocalDate endDate;
 
+    private int lookbackPeriod; // For momentum & mean-reversion
+    private int shortSmaPeriod; // For SMA crossover
+    private int longSmaPeriod; // For SMA crossover
+
     private double finalCapital;
     private double profitLoss;
     private double returnPercentage;
-
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -34,13 +37,18 @@ public class Strategy {
     public Strategy() {
     }
 
-    public Strategy(String strategyType, String tickerSymbol, Double capital, Double thresholdParam, LocalDate startDate, LocalDate endDate) {
+    public Strategy(String strategyType, String tickerSymbol, Double capital, Double thresholdParam,
+            LocalDate startDate, LocalDate endDate,
+            int lookbackPeriod, int shortSmaPeriod, int longSmaPeriod) {
         this.strategyType = strategyType;
         this.tickerSymbol = tickerSymbol;
         this.capital = capital;
         this.thresholdParam = thresholdParam;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.lookbackPeriod = lookbackPeriod;
+        this.shortSmaPeriod = shortSmaPeriod;
+        this.longSmaPeriod = longSmaPeriod;
     }
 
     // Getters and Setters
@@ -118,6 +126,30 @@ public class Strategy {
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public int getLookbackPeriod() {
+        return lookbackPeriod;
+    }
+
+    public void setLookbackPeriod(int lookbackPeriod) {
+        this.lookbackPeriod = lookbackPeriod;
+    }
+
+    public int getShortSmaPeriod() {
+        return shortSmaPeriod;
+    }
+
+    public void setShortSmaPeriod(int shortSmaPeriod) {
+        this.shortSmaPeriod = shortSmaPeriod;
+    }
+
+    public int getLongSmaPeriod() {
+        return longSmaPeriod;
+    }
+
+    public void setLongSmaPeriod(int longSmaPeriod) {
+        this.longSmaPeriod = longSmaPeriod;
     }
 
     public LocalDateTime getCreatedAt() {
