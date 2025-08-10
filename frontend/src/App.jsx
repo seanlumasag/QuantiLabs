@@ -1,49 +1,51 @@
-import InputForm from "./components/InputForm";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
+import StrategiesPage from "./pages/StrategiesPage";
+import ProfilePage from "./pages/ProfilePage";
 
 function App() {
-  const [strategies, setStrategies] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
 
-  const fetchStrategies = async () => {
-    try {
-      const res = await fetch("http://localhost:8080/api/strategy");
-      if (!res.ok) throw new Error("Failed to fetch strategies");
-      const data = await res.json();
-      setStrategies(data);
-    } catch (err) {
-      console.error("Error fetching strategies:", err);
-    }
+  const handleLogin = (userData) => {
+    localStorage.setItem("user", JSON.stringify(userData));
+    setUser(userData);
   };
 
-  const handleAddStrategy = async (strategy) => {
-    setError(null);
-    setLoading(true);
-    try {
-      const res = await fetch("http://localhost:8080/api/strategy", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(strategy),
-      });
-
-      if (!res.ok) throw new Error("Failed to add strategy");
-      await fetchStrategies();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setUser(null);
   };
-
-  useEffect(() => {
-    fetchStrategies();
-  }, []);
 
   return (
-    <div className="app">
-      <InputForm onSubmit={handleAddStrategy} loading={loading} error={error}/>
-    </div>
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            user ? <Navigate to="/strategies" /> : <Navigate to="/login" />
+          }
+        />
+        <Route path="/login" element={<ProfilePage onLogin={handleLogin} />} />
+        <Route
+          path="/strategies"
+          element={
+            user ? (
+              <StrategiesPage userId={user.id} onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+      </Routes>
+    </Router>
   );
 }
 

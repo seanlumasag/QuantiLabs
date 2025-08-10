@@ -1,6 +1,7 @@
 package com.example.backend.service;
 
 import com.example.backend.model.Strategy;
+import com.example.backend.model.DailyResult;
 import com.example.backend.repository.StrategyRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,11 +12,15 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.ArrayList;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 @Service
 public class StrategyService {
@@ -34,9 +39,10 @@ public class StrategyService {
         return strategyRepository.findById(id);
     }
 
-    public Strategy createStrategy(Strategy strategy) {
-        runStrategy(strategy);
-        return strategyRepository.save(strategy);
+    public List<DailyResult> createStrategy(Strategy strategy) {
+        List<DailyResult> dailyResults = runStrategy(strategy);
+        strategyRepository.save(strategy);
+        return dailyResults;
     }
 
     @Value("${alpaca.api.key}")
@@ -48,7 +54,8 @@ public class StrategyService {
     @Value("${alpaca.api.base-url}")
     private String baseUrl;
 
-    public void runStrategy(Strategy strategy) {
+    public List<DailyResult> runStrategy(Strategy strategy) {
+        List<DailyResult> dailyResults = new ArrayList<>();
         try {
             // Format dates for Alpaca API (ISO-8601 with Zulu time)
             String start = strategy.getStartDate().toString() + "T00:00:00Z";
@@ -110,6 +117,13 @@ public class StrategyService {
                             entryPrice = closePrice;
                         }
                     }
+
+                    double portfolioValue = inMarket ? shares * closePrice : capital;
+                    LocalDate date = Instant.ofEpochMilli(bar.get("t").asLong())
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDate();
+                    DailyResult add = new DailyResult(date, portfolioValue);
+                    dailyResults.add(add);
                 }
 
             } else if (strategyType.equals("mean-reversion")) {
@@ -132,6 +146,12 @@ public class StrategyService {
                             entryPrice = closePrice;
                         }
                     }
+                    double portfolioValue = inMarket ? shares * closePrice : capital;
+                    LocalDate date = Instant.ofEpochMilli(bar.get("t").asLong())
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDate();
+                    DailyResult add = new DailyResult(date, portfolioValue);
+                    dailyResults.add(add);
                 }
             } else if (strategyType.equals("sma-crossover")) {
                 int shortSmaPeriod = strategy.getShortSmaPeriod();
@@ -161,6 +181,12 @@ public class StrategyService {
                             shares = capital / closePrice;
                         }
                     }
+                    double portfolioValue = inMarket ? shares * closePrice : capital;
+                    LocalDate date = Instant.ofEpochMilli(bar.get("t").asLong())
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDate();
+                    DailyResult add = new DailyResult(date, portfolioValue);
+                    dailyResults.add(add);
                 }
             }
             if (inMarket) {
@@ -178,6 +204,7 @@ public class StrategyService {
         } catch (Exception e) {
             throw new RuntimeException("Error running strategy", e);
         }
+        return dailyResults;
     }
 
     public void deleteStrategy(UUID id) {

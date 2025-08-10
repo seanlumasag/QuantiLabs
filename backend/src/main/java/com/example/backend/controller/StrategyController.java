@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.model.DailyResult;
 import com.example.backend.model.Strategy;
 import com.example.backend.service.StrategyService;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +38,7 @@ public class StrategyController {
     }
 
     @PostMapping
-    public Strategy createStrategy(@RequestBody Strategy strategy) {
+    public List<DailyResult> createStrategy(@RequestBody Strategy strategy) {
         return strategyService.createStrategy(strategy);
     }
 

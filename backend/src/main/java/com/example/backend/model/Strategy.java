@@ -10,6 +10,8 @@ import org.hibernate.annotations.CreationTimestamp;
 @Table(name = "strategy")
 public class Strategy {
 
+    private UUID userId;
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -39,7 +41,7 @@ public class Strategy {
 
     public Strategy(String strategyType, String tickerSymbol, Double capital, Double thresholdParam,
             LocalDate startDate, LocalDate endDate,
-            int lookbackPeriod, int shortSmaPeriod, int longSmaPeriod) {
+            int lookbackPeriod, int shortSmaPeriod, int longSmaPeriod, UUID userId) {
         this.strategyType = strategyType;
         this.tickerSymbol = tickerSymbol;
         this.capital = capital;
@@ -49,6 +51,7 @@ public class Strategy {
         this.lookbackPeriod = lookbackPeriod;
         this.shortSmaPeriod = shortSmaPeriod;
         this.longSmaPeriod = longSmaPeriod;
+        this.userId = userId;
     }
 
     // Getters and Setters
@@ -154,5 +157,13 @@ public class Strategy {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public void setUserId(UUID userId) {
+        this.userId = userId;
     }
 }
