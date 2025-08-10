@@ -1,6 +1,5 @@
 package com.example.backend.controller;
 
-import com.example.backend.model.DailyResult;
 import com.example.backend.model.Strategy;
 import com.example.backend.service.StrategyService;
 import org.springframework.http.ResponseEntity;
@@ -25,9 +24,9 @@ public class StrategyController {
         return "Backend (/api/strategy) is working!";
     }
 
-    @GetMapping
-    public List<Strategy> getAllStrategies() {
-        return strategyService.getAllStrategies();
+    @GetMapping("/user/{userId}")
+    public List<Strategy> getStrategiesByUserId(@PathVariable UUID userId) {
+        return strategyService.getStrategiesByUserId(userId);
     }
 
     @GetMapping("/{id}")
@@ -38,7 +37,7 @@ public class StrategyController {
     }
 
     @PostMapping
-    public List<DailyResult> createStrategy(@RequestBody Strategy strategy) {
+    public Strategy createStrategy(@RequestBody Strategy strategy) {
         return strategyService.createStrategy(strategy);
     }
 

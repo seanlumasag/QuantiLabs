@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
+import java.util.List;
 
 /**
  * Repository interface for managing Strategy entities.
@@ -12,4 +13,5 @@ import java.util.UUID;
  */
 @Repository
 public interface StrategyRepository extends JpaRepository<Strategy, UUID> {
+    List<Strategy> findByUserId(UUID userId);
 }

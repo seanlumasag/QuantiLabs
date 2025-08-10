@@ -31,18 +31,17 @@ public class StrategyService {
         this.strategyRepository = strategyRepository;
     }
 
-    public List<Strategy> getAllStrategies() {
-        return strategyRepository.findAll();
+    public List<Strategy> getStrategiesByUserId(UUID userId) {
+        return strategyRepository.findByUserId(userId);
     }
 
     public Optional<Strategy> getStrategyById(UUID id) {
         return strategyRepository.findById(id);
     }
 
-    public List<DailyResult> createStrategy(Strategy strategy) {
-        List<DailyResult> dailyResults = runStrategy(strategy);
-        strategyRepository.save(strategy);
-        return dailyResults;
+    public Strategy createStrategy(Strategy strategy) {
+        runStrategy(strategy);
+        return strategyRepository.save(strategy);
     }
 
     @Value("${alpaca.api.key}")

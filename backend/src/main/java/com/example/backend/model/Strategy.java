@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
-@Table(name = "strategy")
+@Table(name = "strategies")
 public class Strategy {
 
     private UUID userId;

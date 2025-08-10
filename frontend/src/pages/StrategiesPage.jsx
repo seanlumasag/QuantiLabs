@@ -12,7 +12,7 @@ function StrategiesPage({ userId, onLogout }) {
     try {
       // Fetch strategies filtered by userId if your backend supports it
       const res = await fetch(
-        `http://localhost:8080/api/strategy?userId=${userId}`
+        `http://localhost:8080/api/strategy/user/${userId}`
       );
       if (!res.ok) throw new Error("Failed to fetch strategies");
       const data = await res.json();
