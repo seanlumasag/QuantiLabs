@@ -8,6 +8,18 @@ function StrategiesPage({ userId, onLogout }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [graphData, setGraphData] = useState([]);
+  useEffect(() => {
+    if (graphData.length > 0) {
+      localStorage.setItem("graphData", JSON.stringify(graphData));
+    }
+  }, [graphData]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("graphData");
+    if (saved) {
+      setGraphData(JSON.parse(saved));
+    }
+  }, []);
 
   const fetchStrategies = async () => {
     setLoading(true);
@@ -37,7 +49,6 @@ function StrategiesPage({ userId, onLogout }) {
       });
       if (!res.ok) throw new Error("Failed to add strategy");
       const createdStrategy = await res.json();
-      await fetchStrategies();
       return createdStrategy; // return here
     } catch (err) {
       setError(err.message);
@@ -76,7 +87,9 @@ function StrategiesPage({ userId, onLogout }) {
     onLogout();
   };
 
-  const handleViewGraph = async (id) => {};
+  const handleViewGraph = async (strategyId) => {
+    await handleRunStrategy(strategyId);
+  };
   const handleEditStrategy = async (id) => {};
   const handleDeleteStrategy = async (id) => {};
 
@@ -92,7 +105,7 @@ function StrategiesPage({ userId, onLogout }) {
         error={error}
         onLogout={handleLogout}
       />
-      <GraphDisplay graphData = {graphData}/>
+      <GraphDisplay graphData={graphData} />
       <div className="strategy-list">
         {strategies.map((strategy) => (
           <StrategyCard

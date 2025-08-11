@@ -13,7 +13,7 @@ function StrategyCard({ strategy, onDelete, onEdit, onViewGraph }) {
   return (
     <div className="strategy-card">
       <h3>{strategy.name}</h3>
-      <p>Type: {strategy.strategyType}</p>
+      <p>Strategy Type: {strategy.strategyType}</p>
       <p>Ticker Symbol: {strategy.tickerSymbol}</p>
       <p>Capital: {strategy.capital}</p>
       <p>Threshold Parameter: {strategy.thresholdParam}</p>
@@ -23,7 +23,7 @@ function StrategyCard({ strategy, onDelete, onEdit, onViewGraph }) {
       <p>Profit/Loss: {strategy.profitLoss} </p>
       <p>Return Percentage: {strategy.returnPercentage}</p>
       <div>
-        <button onClick={() => handleViewGraph}>View Graph</button>
+        <button onClick={() => handleViewGraph(strategy.id)}>View Graph</button>
         <button onClick={() => onEdit(strategy)}>Edit</button>
         <button onClick={() => onDelete(strategy.id)}>Delete</button>
       </div>
