@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function InputForm({ onSubmit, loading, error }) {
+function InputForm({ onSubmit, loading, error, onLogout }) {
   const [form, setForm] = useState({
     strategyType: "",
     tickerSymbol: "",
@@ -8,9 +8,9 @@ function InputForm({ onSubmit, loading, error }) {
     thresholdParam: "",
     startDate: "",
     endDate: "",
-    lookbackPeriod: "", // for momentum & mean-reversion
-    shortSmaPeriod: "", // for sma-crossover
-    longSmaPeriod: "", // for sma-crossover
+    lookbackPeriod: "", // for Momentum & Mean-Reversion
+    shortSmaPeriod: "", // for SMA-Crossover
+    longSmaPeriod: "", // for SMA-Crossover
   });
   const [validationError, setValidationError] = useState(null);
 
@@ -45,15 +45,15 @@ function InputForm({ onSubmit, loading, error }) {
 
     // Validate extra params depending on strategy
     if (
-      (form.strategyType === "momentum" ||
-        form.strategyType === "mean-reversion") &&
+      (form.strategyType === "Momentum" ||
+        form.strategyType === "Mean-Reversion") &&
       (!form.lookbackPeriod || isNaN(Number(form.lookbackPeriod)))
     ) {
       setValidationError("Lookback Period must be a valid number.");
       return;
     }
 
-    if (form.strategyType === "sma-crossover") {
+    if (form.strategyType === "SMA-Crossover") {
       if (!form.shortSmaPeriod || isNaN(Number(form.shortSmaPeriod))) {
         setValidationError("Short SMA Period must be a valid number.");
         return;
@@ -73,16 +73,16 @@ function InputForm({ onSubmit, loading, error }) {
       startDate: form.startDate,
       endDate: form.endDate,
       lookbackPeriod:
-        form.strategyType === "momentum" ||
-        form.strategyType === "mean-reversion"
+        form.strategyType === "Momentum" ||
+        form.strategyType === "Mean-Reversion"
           ? Number(form.lookbackPeriod)
           : undefined,
       shortSmaPeriod:
-        form.strategyType === "sma-crossover"
+        form.strategyType === "SMA-Crossover"
           ? Number(form.shortSmaPeriod)
           : undefined,
       longSmaPeriod:
-        form.strategyType === "sma-crossover"
+        form.strategyType === "SMA-Crossover"
           ? Number(form.longSmaPeriod)
           : undefined,
     };
@@ -120,9 +120,9 @@ function InputForm({ onSubmit, loading, error }) {
             <option value="" disabled>
               Select strategy type
             </option>
-            <option value="momentum">Momentum</option>
-            <option value="mean-reversion">Mean-Reversion</option>
-            <option value="sma-crossover">SMA-Crossover</option>
+            <option value="Momentum">Momentum</option>
+            <option value="Mean-Reversion">Mean-Reversion</option>
+            <option value="SMA-Crossover">SMA-Crossover</option>
           </select>
         </label>
       </div>
@@ -199,8 +199,8 @@ function InputForm({ onSubmit, loading, error }) {
       </div>
 
       {/* Conditional inputs for Momentum & Mean-Reversion */}
-      {(form.strategyType === "momentum" ||
-        form.strategyType === "mean-reversion") && (
+      {(form.strategyType === "Momentum" ||
+        form.strategyType === "Mean-Reversion") && (
         <div>
           <label>
             Lookback Period (days):
@@ -218,7 +218,7 @@ function InputForm({ onSubmit, loading, error }) {
       )}
 
       {/* Conditional inputs for SMA-Crossover */}
-      {form.strategyType === "sma-crossover" && (
+      {form.strategyType === "SMA-Crossover" && (
         <>
           <div>
             <label>
@@ -254,6 +254,7 @@ function InputForm({ onSubmit, loading, error }) {
       <button type="submit" disabled={loading}>
         {loading ? "Adding..." : "Test Strategy"}
       </button>
+      <button onClick={onLogout}>Logout</button>
     </form>
   );
 }

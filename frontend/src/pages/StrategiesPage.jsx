@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import InputForm from "../components/InputForm";
+import StrategyCard from "../components/StrategyCard";
 
 function StrategiesPage({ userId, onLogout }) {
   const [strategies, setStrategies] = useState([]);
@@ -10,7 +11,6 @@ function StrategiesPage({ userId, onLogout }) {
     setLoading(true);
     setError(null);
     try {
-      // Fetch strategies filtered by userId if your backend supports it
       const res = await fetch(
         `http://localhost:8080/api/strategy/user/${userId}`
       );
@@ -28,7 +28,6 @@ function StrategiesPage({ userId, onLogout }) {
     setError(null);
     setLoading(true);
     try {
-      // Add userId to the strategy payload
       const res = await fetch("http://localhost:8080/api/strategy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -43,23 +42,37 @@ function StrategiesPage({ userId, onLogout }) {
     }
   };
 
-  useEffect(() => {
-    fetchStrategies();
-  }, [userId]);
-
   const handleLogout = () => {
     onLogout();
   };
 
+  const handleViewGraph = async (id) => {};
+  const handleEditStrategy = async (id) => {};
+  const handleDeleteStrategy = async (id) => {};
+
+  useEffect(() => {
+    fetchStrategies();
+  }, [userId]);
+
   return (
     <div className="strategies-page">
-      <h1>Your Strategies</h1>
-      <button onClick={handleLogout}>Logout</button>
-
-      {loading && <p>Loading...</p>}
-      {error && <p style={{ color: "red" }}>Error: {error}</p>}
-
-      <InputForm onSubmit={handleAddStrategy} loading={loading} error={error} />
+      <InputForm
+        onSubmit={handleAddStrategy}
+        loading={loading}
+        error={error}
+        onLogout={handleLogout}
+      />
+      <div className="strategy-list">
+        {strategies.map((strategy) => (
+          <StrategyCard
+            key={strategy.id}
+            strategy={strategy}
+            onViewGraph={handleViewGraph}
+            onEdit={handleEditStrategy}
+            onDelete={handleDeleteStrategy}
+          />
+        ))}
+      </div>
     </div>
   );
 }

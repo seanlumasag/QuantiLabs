@@ -42,14 +42,12 @@ function ProfilePage({ onLogin }) {
 
     try {
       if (userExists) {
-        // Login: fetch user info with userId
         const res = await fetch("http://localhost:8080/api/users/" + username);
         if (!res.ok) throw new Error("Failed to fetch user info");
         const userData = await res.json();
         onLogin(userData);
         navigate("/strategies");
       } else {
-        // Sign up: create user and get user info including userId
         const createRes = await fetch("http://localhost:8080/api/users", {
           method: "POST",
           headers: { "Content-Type": "application/json" },

@@ -96,7 +96,7 @@ public class StrategyService {
             double shares = 0.0;
             double entryPrice = 0.0;
 
-            if (strategyType.equals("momentum")) {
+            if (strategyType.equals("Momentum")) {
                 int lookbackPeriod = strategy.getLookbackPeriod();
                 for (int i = lookbackPeriod; i < bars.size(); i++) {
                     JsonNode bar = bars.get(i);
@@ -125,7 +125,7 @@ public class StrategyService {
                     dailyResults.add(add);
                 }
 
-            } else if (strategyType.equals("mean-reversion")) {
+            } else if (strategyType.equals("Mean-Reversion")) {
                 int lookbackPeriod = strategy.getLookbackPeriod();
                 for (int i = lookbackPeriod; i < bars.size(); i++) {
                     JsonNode bar = bars.get(i);
@@ -152,7 +152,7 @@ public class StrategyService {
                     DailyResult add = new DailyResult(date, portfolioValue);
                     dailyResults.add(add);
                 }
-            } else if (strategyType.equals("sma-crossover")) {
+            } else if (strategyType.equals("SMA-Crossover")) {
                 int shortSmaPeriod = strategy.getShortSmaPeriod();
                 int longSmaPeriod = strategy.getLongSmaPeriod();
                 for (int i = longSmaPeriod; i < bars.size(); i++) {
