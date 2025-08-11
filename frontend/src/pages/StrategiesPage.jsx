@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import InputForm from "../components/InputForm";
 import StrategyCard from "../components/StrategyCard";
+import GraphDisplay from "../components/GraphDisplay";
 
 function StrategiesPage({ userId, onLogout }) {
   const [strategies, setStrategies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [graphData, setGraphData] = useState([]);
 
   const fetchStrategies = async () => {
     setLoading(true);
@@ -34,12 +36,40 @@ function StrategiesPage({ userId, onLogout }) {
         body: JSON.stringify({ ...strategy, userId }),
       });
       if (!res.ok) throw new Error("Failed to add strategy");
+      const createdStrategy = await res.json();
       await fetchStrategies();
+      return createdStrategy; // return here
+    } catch (err) {
+      setError(err.message);
+      throw err; // re-throw so handleAddRunStrategy can catch it if needed
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRunStrategy = async (strategyId) => {
+    setError(null);
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `http://localhost:8080/api/strategy/run/${strategyId}`
+      );
+      if (!res.ok) throw new Error("Failed to run strategy");
+      const dailyResults = await res.json();
+      setGraphData(dailyResults);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAddRunStrategy = async (strategy) => {
+    try {
+      const createdStrategy = await handleAddStrategy(strategy);
+      await handleRunStrategy(createdStrategy.id);
+      fetchStrategies();
+    } catch (err) {}
   };
 
   const handleLogout = () => {
@@ -57,11 +87,12 @@ function StrategiesPage({ userId, onLogout }) {
   return (
     <div className="strategies-page">
       <InputForm
-        onSubmit={handleAddStrategy}
+        onSubmit={handleAddRunStrategy}
         loading={loading}
         error={error}
         onLogout={handleLogout}
       />
+      <GraphDisplay graphData = {graphData}/>
       <div className="strategy-list">
         {strategies.map((strategy) => (
           <StrategyCard

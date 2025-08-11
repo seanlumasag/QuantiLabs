@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.model.DailyResult;
 import com.example.backend.model.Strategy;
 import com.example.backend.service.StrategyService;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,17 @@ public class StrategyController {
     @GetMapping("/test")
     public String testEndpoint() {
         return "Backend (/api/strategy) is working!";
+    }
+
+    @GetMapping("/run/{id}")
+    public ResponseEntity<List<DailyResult>> runStrategy(@PathVariable UUID id) {
+        Optional<Strategy> optionalStrategy = strategyService.getStrategyById(id);
+        if (optionalStrategy.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Strategy strategy = optionalStrategy.get();
+        List<DailyResult> results = strategyService.runStrategy(strategy);
+        return ResponseEntity.ok(results);
     }
 
     @GetMapping("/user/{userId}")

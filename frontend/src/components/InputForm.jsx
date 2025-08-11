@@ -8,9 +8,9 @@ function InputForm({ onSubmit, loading, error, onLogout }) {
     thresholdParam: "",
     startDate: "",
     endDate: "",
-    lookbackPeriod: "", // for Momentum & Mean-Reversion
-    shortSmaPeriod: "", // for SMA-Crossover
-    longSmaPeriod: "", // for SMA-Crossover
+    lookbackPeriod: "",
+    shortSmaPeriod: "",
+    longSmaPeriod: "",
   });
   const [validationError, setValidationError] = useState(null);
 

@@ -6,7 +6,7 @@ function StrategyCard({ strategy, onDelete, onEdit, onViewGraph }) {
   const handleViewGraph = () => {
     setShowGraph(!showGraph);
     if (!showGraph) {
-      onViewGraph(strategy.id); // Trigger graph fetch when opening
+      onViewGraph(strategy.id);
     }
   };
 

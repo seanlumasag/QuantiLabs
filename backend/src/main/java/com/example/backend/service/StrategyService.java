@@ -21,6 +21,8 @@ import java.net.http.HttpResponse;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 public class StrategyService {
@@ -40,7 +42,6 @@ public class StrategyService {
     }
 
     public Strategy createStrategy(Strategy strategy) {
-        runStrategy(strategy);
         return strategyRepository.save(strategy);
     }
 
@@ -100,6 +101,7 @@ public class StrategyService {
                 int lookbackPeriod = strategy.getLookbackPeriod();
                 for (int i = lookbackPeriod; i < bars.size(); i++) {
                     JsonNode bar = bars.get(i);
+
                     double closePrice = bar.get("c").asDouble();
                     double refClosePrice = bars.get(i - lookbackPeriod).get("c").asDouble();
                     if (inMarket) {
@@ -118,9 +120,9 @@ public class StrategyService {
                     }
 
                     double portfolioValue = inMarket ? shares * closePrice : capital;
-                    LocalDate date = Instant.ofEpochMilli(bar.get("t").asLong())
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalDate();
+                    String timestampStr = bar.get("t").asText(); // e.g. "2025-06-02T04:00:00Z"
+                    ZonedDateTime zdt = ZonedDateTime.parse(timestampStr, DateTimeFormatter.ISO_ZONED_DATE_TIME);
+                    LocalDate date = zdt.toLocalDate();
                     DailyResult add = new DailyResult(date, portfolioValue);
                     dailyResults.add(add);
                 }
@@ -146,9 +148,9 @@ public class StrategyService {
                         }
                     }
                     double portfolioValue = inMarket ? shares * closePrice : capital;
-                    LocalDate date = Instant.ofEpochMilli(bar.get("t").asLong())
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalDate();
+                    String timestampStr = bar.get("t").asText(); // e.g. "2025-06-02T04:00:00Z"
+                    ZonedDateTime zdt = ZonedDateTime.parse(timestampStr, DateTimeFormatter.ISO_ZONED_DATE_TIME);
+                    LocalDate date = zdt.toLocalDate();
                     DailyResult add = new DailyResult(date, portfolioValue);
                     dailyResults.add(add);
                 }
@@ -181,9 +183,9 @@ public class StrategyService {
                         }
                     }
                     double portfolioValue = inMarket ? shares * closePrice : capital;
-                    LocalDate date = Instant.ofEpochMilli(bar.get("t").asLong())
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalDate();
+                    String timestampStr = bar.get("t").asText(); // e.g. "2025-06-02T04:00:00Z"
+                    ZonedDateTime zdt = ZonedDateTime.parse(timestampStr, DateTimeFormatter.ISO_ZONED_DATE_TIME);
+                    LocalDate date = zdt.toLocalDate();
                     DailyResult add = new DailyResult(date, portfolioValue);
                     dailyResults.add(add);
                 }
@@ -195,7 +197,7 @@ public class StrategyService {
 
             double finalCapital = capital;
 
-            // Set results
+ 
             strategy.setFinalCapital(finalCapital);
             strategy.setProfitLoss(finalCapital - initialCapital);
             strategy.setReturnPercentage((finalCapital - initialCapital) / initialCapital * 100);
@@ -203,6 +205,7 @@ public class StrategyService {
         } catch (Exception e) {
             throw new RuntimeException("Error running strategy", e);
         }
+        strategyRepository.save(strategy);
         return dailyResults;
     }
 
