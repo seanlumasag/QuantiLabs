@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-function ProfilePage({ onLogin }) {
+function ProfilePage({ onLogin, onDelete }) {
   const [username, setUsername] = useState("");
   const [status, setStatus] = useState(null);
   const [userExists, setUserExists] = useState(null);
@@ -63,6 +63,26 @@ function ProfilePage({ onLogin }) {
     }
   };
 
+  const handleDelete = async () => {
+    if (
+      !window.confirm(
+        `Are you sure you want to delete user "${username}" and all related data? This cannot be undone.`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`http://localhost:8080/api/users/${username}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to delete user");
+      onDelete(); // Clear logged-in user state
+      navigate("/"); // Redirect to login or home page
+    } catch (error) {
+    }
+  };
+
   const buttonText = userExists ? "Login" : "Sign Up";
 
   return (
@@ -81,6 +101,8 @@ function ProfilePage({ onLogin }) {
         </label>
         <button type="submit">{buttonText}</button>
       </form>
+      {userExists && <button onClick={handleDelete}>Delete User</button>}
+
       {status && <p>{status}</p>}
     </div>
   );

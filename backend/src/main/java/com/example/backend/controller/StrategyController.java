@@ -3,6 +3,8 @@ package com.example.backend.controller;
 import com.example.backend.model.DailyResult;
 import com.example.backend.model.Strategy;
 import com.example.backend.service.StrategyService;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,8 +51,10 @@ public class StrategyController {
     }
 
     @PostMapping
-    public Strategy createStrategy(@RequestBody Strategy strategy) {
-        return strategyService.createStrategy(strategy);
+    public ResponseEntity<Strategy> createStrategy(@RequestBody Strategy strategy) {
+        System.out.println("Creating strategy: " + strategy);
+        Strategy createdStrategy = strategyService.createStrategy(strategy);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdStrategy);
     }
 
     @PutMapping("/{id}")

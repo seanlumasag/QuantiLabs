@@ -83,10 +83,6 @@ function StrategiesPage({ userId, onLogout }) {
     } catch (err) {}
   };
 
-  const handleLogout = () => {
-    onLogout();
-  };
-
   const handleViewGraph = async (strategyId) => {
     await handleRunStrategy(strategyId);
   };
@@ -103,7 +99,6 @@ function StrategiesPage({ userId, onLogout }) {
         onSubmit={handleAddRunStrategy}
         loading={loading}
         error={error}
-        onLogout={handleLogout}
       />
       <GraphDisplay graphData={graphData} />
       <div className="strategy-list">
@@ -117,6 +112,7 @@ function StrategiesPage({ userId, onLogout }) {
           />
         ))}
       </div>
+      <button onClick={onLogout}>Logout</button>
     </div>
   );
 }

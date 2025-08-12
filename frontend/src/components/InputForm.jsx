@@ -254,7 +254,7 @@ function InputForm({ onSubmit, loading, error, onLogout }) {
       <button type="submit" disabled={loading}>
         {loading ? "Adding..." : "Test Strategy"}
       </button>
-      <button onClick={onLogout}>Logout</button>
+      
     </form>
   );
 }

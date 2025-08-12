@@ -33,7 +33,7 @@ function App() {
             user ? <Navigate to="/strategies" /> : <Navigate to="/login" />
           }
         />
-        <Route path="/login" element={<ProfilePage onLogin={handleLogin} />} />
+        <Route path="/login" element={<ProfilePage onLogin={handleLogin} onDelete={handleLogout}/>} />
         <Route
           path="/strategies"
           element={

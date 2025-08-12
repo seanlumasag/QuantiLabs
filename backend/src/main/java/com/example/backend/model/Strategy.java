@@ -10,11 +10,11 @@ import org.hibernate.annotations.CreationTimestamp;
 @Table(name = "strategies")
 public class Strategy {
 
-    private UUID userId;
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
+    private UUID userId;
 
     private String strategyType; // e.g. "momentum", "mean-reversion", "sma-deviation"
     private String tickerSymbol; // e.g. "AAPL", "TSLA"
@@ -28,8 +28,6 @@ public class Strategy {
     private int longSmaPeriod; // For SMA crossover
 
     private double finalCapital;
-    private double profitLoss;
-    private double returnPercentage;
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -99,22 +97,6 @@ public class Strategy {
         this.finalCapital = finalCapital;
     }
 
-    public Double getProfitLoss() {
-        return profitLoss;
-    }
-
-    public void setProfitLoss(Double profitLoss) {
-        this.profitLoss = profitLoss;
-    }
-
-    public Double getReturnPercentage() {
-        return returnPercentage;
-    }
-
-    public void setReturnPercentage(Double returnPercentage) {
-        this.returnPercentage = returnPercentage;
-    }
-
     public LocalDate getStartDate() {
         return startDate;
     }
@@ -166,4 +148,5 @@ public class Strategy {
     public void setUserId(UUID userId) {
         this.userId = userId;
     }
+
 }
