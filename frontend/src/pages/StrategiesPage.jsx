@@ -14,13 +14,6 @@ function StrategiesPage({ userId, onLogout }) {
     }
   }, [graphData]);
 
-  useEffect(() => {
-    const saved = localStorage.getItem("graphData");
-    if (saved) {
-      setGraphData(JSON.parse(saved));
-    }
-  }, []);
-
   const fetchStrategies = async () => {
     setLoading(true);
     setError(null);
@@ -86,8 +79,17 @@ function StrategiesPage({ userId, onLogout }) {
   const handleViewGraph = async (strategyId) => {
     await handleRunStrategy(strategyId);
   };
-  const handleEditStrategy = async (id) => {};
-  const handleDeleteStrategy = async (id) => {};
+
+  const handleDeleteStrategy = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/strategy/${id}`, {
+        method: "DELETE",
+      });
+    } catch (error) {
+      console.error("Error deleting strategy:", error);
+    }
+    fetchStrategies();
+  };
 
   useEffect(() => {
     fetchStrategies();
@@ -107,7 +109,6 @@ function StrategiesPage({ userId, onLogout }) {
             key={strategy.id}
             strategy={strategy}
             onViewGraph={handleViewGraph}
-            onEdit={handleEditStrategy}
             onDelete={handleDeleteStrategy}
           />
         ))}
