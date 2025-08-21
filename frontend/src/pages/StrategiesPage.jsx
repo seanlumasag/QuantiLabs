@@ -104,15 +104,19 @@ function StrategiesPage({ userId, onLogout }) {
       />
       <GraphDisplay graphData={graphData} />
       <div className="strategy-list">
-        {strategies.map((strategy) => (
-          <StrategyCard
-            key={strategy.id}
-            strategy={strategy}
-            onViewGraph={handleViewGraph}
-            onDelete={handleDeleteStrategy}
-          />
-        ))}
+        {strategies
+          .slice()
+          .reverse()
+          .map((strategy) => (
+            <StrategyCard
+              key={strategy.id}
+              strategy={strategy}
+              onViewGraph={handleViewGraph}
+              onDelete={handleDeleteStrategy}
+            />
+          ))}
       </div>
+
       <button onClick={onLogout}>Logout</button>
     </div>
   );
