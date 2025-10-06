@@ -79,31 +79,63 @@ function ProfilePage({ onLogin, onDelete }) {
       if (!res.ok) throw new Error("Failed to delete user");
       onDelete(); // Clear logged-in user state
       navigate("/"); // Redirect to login or home page
-    } catch (error) {
-    }
+    } catch (error) {}
   };
 
   const buttonText = userExists ? "Login" : "Sign Up";
 
   return (
-    <div>
-      <h1>Welcome</h1>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Username:
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            autoComplete="off"
-          />
-        </label>
-        <button type="submit">{buttonText}</button>
-      </form>
-      {userExists && <button onClick={handleDelete}>Delete User</button>}
+    <div className="page-container page-container-no-nav">
+      <div className="profile-container">
+        <div className="profile-card">
+          <div className="profile-header">
+            <h1 className="profile-title">QuantiLabs</h1>
+            <p className="profile-subtitle">
+              Your Quantitative Trading Platform
+            </p>
+          </div>
 
-      {status && <p>{status}</p>}
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label className="form-label">Username:</label>
+              <input
+                type="text"
+                className="form-input"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                autoComplete="off"
+                placeholder="Enter your username"
+              />
+            </div>
+
+            <button type="submit" className="btn btn-primary btn-lg w-full">
+              {buttonText}
+            </button>
+          </form>
+
+          {userExists && (
+            <div className="mt-4">
+              <button
+                onClick={handleDelete}
+                className="btn btn-danger btn-lg w-full"
+              >
+                Delete User
+              </button>
+            </div>
+          )}
+
+          {status && (
+            <div
+              className={`mt-4 ${
+                status.includes("Error") ? "error" : "success"
+              }`}
+            >
+              {status}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

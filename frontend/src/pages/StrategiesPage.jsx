@@ -78,6 +78,17 @@ function StrategiesPage({ userId, onLogout }) {
 
   const handleViewGraph = async (strategyId) => {
     await handleRunStrategy(strategyId);
+
+    // Scroll to graph after data is loaded
+    setTimeout(() => {
+      const graphElement = document.getElementById("strategy-graph");
+      if (graphElement) {
+        graphElement.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    }, 100); // Small delay to ensure graph is rendered
   };
 
   const handleDeleteStrategy = async (id) => {
@@ -96,28 +107,54 @@ function StrategiesPage({ userId, onLogout }) {
   }, [userId]);
 
   return (
-    <div className="strategies-page">
-      <InputForm
-        onSubmit={handleAddRunStrategy}
-        loading={loading}
-        error={error}
-      />
-      <GraphDisplay graphData={graphData} />
-      <div className="strategy-list">
-        {strategies
-          .slice()
-          .reverse()
-          .map((strategy) => (
-            <StrategyCard
-              key={strategy.id}
-              strategy={strategy}
-              onViewGraph={handleViewGraph}
-              onDelete={handleDeleteStrategy}
-            />
-          ))}
+    <div className="page-container page-container-with-nav">
+      <div className="nav-header">
+        <div className="nav-content">
+          <h1 className="logo">QuantiLabs</h1>
+          <div className="nav-actions">
+            <button onClick={onLogout} className="btn btn-secondary">
+              Logout
+            </button>
+          </div>
+        </div>
       </div>
 
-      <button onClick={onLogout}>Logout</button>
+      <div className="container" style={{ paddingTop: "var(--spacing-xl)" }}>
+        <InputForm
+          onSubmit={handleAddRunStrategy}
+          loading={loading}
+          error={error}
+          onLogout={onLogout}
+        />
+
+        <GraphDisplay graphData={graphData} />
+
+        {error && <div className="error">{error}</div>}
+
+        {loading && <div className="loading">Loading strategies...</div>}
+
+        <div className="strategies-grid">
+          {strategies
+            .slice()
+            .reverse()
+            .map((strategy) => (
+              <StrategyCard
+                key={strategy.id}
+                strategy={strategy}
+                onViewGraph={handleViewGraph}
+                onDelete={handleDeleteStrategy}
+              />
+            ))}
+        </div>
+
+        {strategies.length === 0 && !loading && (
+          <div className="text-center mt-5">
+            <p className="text-muted">
+              No strategies found. Create your first strategy above!
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -104,106 +104,109 @@ function InputForm({ onSubmit, loading, error, onLogout }) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Test New Strategy</h2>
-      {validationError && <p style={{ color: "red" }}>{validationError}</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <div>
-        <label>
-          Strategy Type:
-          <select
-            name="strategyType"
-            value={form.strategyType}
-            onChange={handleChange}
-            required
-          >
-            <option value="" disabled>
-              Select strategy type
-            </option>
-            <option value="Momentum">Momentum</option>
-            <option value="Mean-Reversion">Mean-Reversion</option>
-            <option value="SMA-Crossover">SMA-Crossover</option>
-          </select>
-        </label>
-      </div>
+    <div className="input-form">
+      <h2 className="form-title">Create New Strategy</h2>
 
-      <div>
-        <label>
-          Ticker Symbol:
-          <input
-            type="text"
-            name="tickerSymbol"
-            value={form.tickerSymbol}
-            onChange={handleChange}
-            placeholder="e.g. AAPL"
-            required
-          />
-        </label>
-      </div>
+      {validationError && <div className="error">{validationError}</div>}
 
-      <div>
-        <label>
-          Capital:
-          <input
-            type="number"
-            name="capital"
-            value={form.capital}
-            onChange={handleChange}
-            placeholder="e.g. 1000"
-            required
-            min="0"
-            step="any"
-          />
-        </label>
-      </div>
+      {error && <div className="error">{error}</div>}
 
-      <div>
-        <label>
-          Threshold Parameter:
-          <input
-            type="number"
-            name="thresholdParam"
-            value={form.thresholdParam}
-            onChange={handleChange}
-            placeholder="e.g. 0.05"
-            required
-            step="any"
-          />
-        </label>
-      </div>
+      <form onSubmit={handleSubmit}>
+        <div className="form-row">
+          <div className="form-group">
+            <label className="form-label">Strategy Type *</label>
+            <select
+              name="strategyType"
+              value={form.strategyType}
+              onChange={handleChange}
+              required
+              className="form-select"
+            >
+              <option value="" disabled>
+                Select strategy type
+              </option>
+              <option value="Momentum">Momentum</option>
+              <option value="Mean-Reversion">Mean-Reversion</option>
+              <option value="SMA-Crossover">SMA-Crossover</option>
+            </select>
+          </div>
 
-      <div>
-        <label>
-          Start Date:
-          <input
-            type="date"
-            name="startDate"
-            value={form.startDate}
-            onChange={handleChange}
-            required
-          />
-        </label>
-      </div>
+          <div className="form-group">
+            <label className="form-label">Ticker Symbol *</label>
+            <input
+              type="text"
+              name="tickerSymbol"
+              value={form.tickerSymbol}
+              onChange={handleChange}
+              placeholder="e.g. AAPL"
+              required
+              className="form-input"
+            />
+          </div>
+        </div>
 
-      <div>
-        <label>
-          End Date:
-          <input
-            type="date"
-            name="endDate"
-            value={form.endDate}
-            onChange={handleChange}
-            required
-          />
-        </label>
-      </div>
+        <div className="form-row">
+          <div className="form-group">
+            <label className="form-label">Initial Capital *</label>
+            <input
+              type="number"
+              name="capital"
+              value={form.capital}
+              onChange={handleChange}
+              placeholder="e.g. 10000"
+              required
+              min="0"
+              step="any"
+              className="form-input"
+            />
+          </div>
 
-      {/* Conditional inputs for Momentum & Mean-Reversion */}
-      {(form.strategyType === "Momentum" ||
-        form.strategyType === "Mean-Reversion") && (
-        <div>
-          <label>
-            Lookback Period (days):
+          <div className="form-group">
+            <label className="form-label">Threshold Parameter *</label>
+            <input
+              type="number"
+              name="thresholdParam"
+              value={form.thresholdParam}
+              onChange={handleChange}
+              placeholder="e.g. 0.05"
+              required
+              step="any"
+              className="form-input"
+            />
+          </div>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label className="form-label">Start Date *</label>
+            <input
+              type="date"
+              name="startDate"
+              value={form.startDate}
+              onChange={handleChange}
+              required
+              className="form-input"
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">End Date *</label>
+            <input
+              type="date"
+              name="endDate"
+              value={form.endDate}
+              onChange={handleChange}
+              required
+              className="form-input"
+            />
+          </div>
+        </div>
+
+        {/* Conditional inputs for Momentum & Mean-Reversion */}
+        {(form.strategyType === "Momentum" ||
+          form.strategyType === "Mean-Reversion") && (
+          <div className="form-group">
+            <label className="form-label">Lookback Period (days) *</label>
             <input
               type="number"
               name="lookbackPeriod"
@@ -212,17 +215,16 @@ function InputForm({ onSubmit, loading, error, onLogout }) {
               placeholder="e.g. 5"
               required
               min="1"
+              className="form-input"
             />
-          </label>
-        </div>
-      )}
+          </div>
+        )}
 
-      {/* Conditional inputs for SMA-Crossover */}
-      {form.strategyType === "SMA-Crossover" && (
-        <>
-          <div>
-            <label>
-              Short SMA Period:
+        {/* Conditional inputs for SMA-Crossover */}
+        {form.strategyType === "SMA-Crossover" && (
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">Short SMA Period *</label>
               <input
                 type="number"
                 name="shortSmaPeriod"
@@ -231,31 +233,36 @@ function InputForm({ onSubmit, loading, error, onLogout }) {
                 placeholder="e.g. 5"
                 required
                 min="1"
+                className="form-input"
               />
-            </label>
-          </div>
-          <div>
-            <label>
-              Long SMA Period:
+            </div>
+            <div className="form-group">
+              <label className="form-label">Long SMA Period *</label>
               <input
                 type="number"
                 name="longSmaPeriod"
                 value={form.longSmaPeriod}
                 onChange={handleChange}
-                placeholder="e.g. 10"
+                placeholder="e.g. 20"
                 required
                 min="1"
+                className="form-input"
               />
-            </label>
+            </div>
           </div>
-        </>
-      )}
+        )}
 
-      <button type="submit" disabled={loading}>
-        {loading ? "Adding..." : "Test Strategy"}
-      </button>
-      
-    </form>
+        <div className="form-group">
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn btn-primary btn-lg w-full"
+          >
+            {loading ? "Creating Strategy..." : "Test Strategy"}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }
 

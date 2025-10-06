@@ -42,19 +42,40 @@ function StrategyCard({ strategy, onDelete, onEdit, onViewGraph }) {
     handleGenerateMiniGraph(strategy.id);
   }, [strategy.id]);
 
+  const profitLoss = strategy.finalCapital - strategy.capital;
+  const returnPercentage = (profitLoss / strategy.capital) * 100;
+  const isProfit = profitLoss >= 0;
+
   return (
     <div className="strategy-card">
+      <div className="card-header">
+        <h3 className="strategy-title">
+          {strategy.name || `${strategy.strategyType} Strategy`}
+        </h3>
+        <div className="strategy-meta">
+          <span className="text-secondary">{strategy.tickerSymbol}</span>
+          <span className="text-secondary">
+            {strategy.startDate} to {strategy.endDate}
+          </span>
+        </div>
+      </div>
+
       {miniGraphData.length > 0 && (
-        <div style={{ width: "100%", height: 100, marginTop: "10px" }}>
+        <div className="mb-3" style={{ width: "100%", height: 120 }}>
           <ResponsiveContainer>
             <LineChart data={miniGraphData}>
               <XAxis dataKey="date" hide={true} />
               <YAxis hide={true} domain={["auto", "auto"]} />
-              <Tooltip />
+              <Tooltip
+                labelFormatter={(value) => `Date: ${value}`}
+                formatter={(value) => [`$${value.toFixed(2)}`, "Capital"]}
+              />
               <Line
                 type="monotone"
                 dataKey="capital"
-                stroke="#8884d8"
+                stroke={
+                  isProfit ? "var(--success-color)" : "var(--danger-color)"
+                }
                 strokeWidth={2}
                 dot={false}
               />
@@ -62,28 +83,76 @@ function StrategyCard({ strategy, onDelete, onEdit, onViewGraph }) {
           </ResponsiveContainer>
         </div>
       )}
-      <h3>{strategy.name}</h3>
-      <p>Strategy Type: {strategy.strategyType}</p>
-      <p>Ticker Symbol: {strategy.tickerSymbol}</p>
-      <p>Capital: {strategy.capital}</p>
-      <p>Threshold Parameter: {strategy.thresholdParam}</p>
-      <p>Start Date: {strategy.startDate}</p>
-      <p>End Date: {strategy.endDate}</p>
-      <p>Final Capital: {strategy.finalCapital.toFixed(2)} </p>
-      <p>
-        Profit/Loss: {(strategy.finalCapital - strategy.capital).toFixed(2)}{" "}
-      </p>
-      <p>
-        Return Percentage:{" "}
-        {(
-          (strategy.finalCapital - strategy.capital) /
-          strategy.capital * 100
-        ).toFixed(2)}%
-      </p>
 
-      <div>
-        <button onClick={() => handleViewGraph(strategy.id)}>View Graph</button>
-        <button onClick={() => onDelete(strategy.id)}>Delete</button>
+      <div className="strategy-info">
+        <div className="grid grid-2 mb-3">
+          <div>
+            <span className="text-secondary text-sm">Strategy Type:</span>
+            <p className="font-medium">{strategy.strategyType}</p>
+          </div>
+          <div>
+            <span className="text-secondary text-sm">Threshold:</span>
+            <p className="font-medium">{strategy.thresholdParam}</p>
+          </div>
+        </div>
+
+        <div className="grid grid-2 mb-3">
+          <div>
+            <span className="text-secondary text-sm">Initial Capital:</span>
+            <p className="font-medium font-mono">
+              ${strategy.capital.toFixed(2)}
+            </p>
+          </div>
+          <div>
+            <span className="text-secondary text-sm">Final Capital:</span>
+            <p className="font-medium font-mono">
+              ${strategy.finalCapital.toFixed(2)}
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-2 mb-3">
+          <div>
+            <span className="text-secondary text-sm">Profit/Loss:</span>
+            <p
+              className={`font-medium font-mono ${
+                isProfit ? "text-success" : "text-danger"
+              }`}
+            >
+              {isProfit ? "+" : ""}${profitLoss.toFixed(2)}
+            </p>
+          </div>
+          <div>
+            <span className="text-secondary text-sm">Return:</span>
+            <p
+              className={`font-medium font-mono ${
+                isProfit ? "text-success" : "text-danger"
+              }`}
+            >
+              {isProfit ? "+" : ""}
+              {returnPercentage.toFixed(2)}%
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {error && <div className="error mb-3">{error}</div>}
+
+      {loading && <div className="loading mb-3">Loading graph data...</div>}
+
+      <div className="strategy-actions">
+        <button
+          onClick={() => handleViewGraph(strategy.id)}
+          className="btn btn-primary btn-sm"
+        >
+          View Graph
+        </button>
+        <button
+          onClick={() => onDelete(strategy.id)}
+          className="btn btn-danger btn-sm"
+        >
+          Delete
+        </button>
       </div>
     </div>
   );
